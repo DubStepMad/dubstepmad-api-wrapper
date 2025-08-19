@@ -1,0 +1,16 @@
+{
+  "name": "@dubstepmad/dubstepmad-api-wrapper",
+  "version": "1.0.0",
+  "description": "TypeScript wrapper for the DubstepMad API",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch"
+  },
+  "keywords": ["dubstepmad", "api", "wrapper", "music"],
+  "author": "DubStepMad",
+  "license": "MIT"
+}
