@@ -8,9 +8,21 @@
   "type": "module",
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --watch"
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests"
   },
-  "keywords": ["dubstepmad", "api", "wrapper", "music"],
+  "keywords": [
+    "dubstepmad",
+    "api",
+    "wrapper",
+    "music"
+  ],
   "author": "DubStepMad",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "cross-env": "^10.0.0",
+    "jest": "^30.0.5",
+    "ts-jest": "^29.4.1"
+  }
 }
