@@ -1,6 +1,6 @@
 {
   "name": "@dubstepmad/dubstepmad-api-wrapper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TypeScript wrapper for the DubstepMad API",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -23,6 +23,7 @@
     "@types/jest": "^30.0.0",
     "cross-env": "^10.0.0",
     "jest": "^30.0.5",
-    "ts-jest": "^29.4.1"
+    "ts-jest": "^29.4.1",
+    "tsup": "^8.5.0"
   }
 }

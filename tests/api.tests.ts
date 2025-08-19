@@ -13,7 +13,7 @@ describe("DubstepMadAPI Wrapper", () => {
   });
 
   it("should throw on invalid endpoint", async () => {
-    const badApi = new DubstepMadAPI("https://example.com/404");
+    const badApi = new DubstepMadAPI("https://dubstepmad.com/invalid");
     await expect(badApi.getTracks()).rejects.toThrow();
   });
 
