@@ -4,7 +4,7 @@ module.exports = {
   testEnvironment: "node",
   testRegex: "(/tests/.*|(\\.|/)(test|spec))\\.ts$", // <-- reliable for ESM + TS
   transform: {
-    "^.+\\.ts$": "ts-jest"
+    "^.+\\.ts$": ["ts-jest", {}], // modern way
   },
   globals: {
     "ts-jest": {
