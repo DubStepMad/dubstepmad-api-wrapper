@@ -6,102 +6,10 @@
  * clean design, strong typing, and maintainability.
  */
 
-export interface ApiError extends Error {
-  status?: number;
-}
+import { MemeOptions, ImageFilterOptions, ApiResponse } from "./types";
+import { fetchImage } from "./utils";
+import { EndpointBuilder } from "./builder";
 
-export interface MemeOptions {
-  text?: string;
-  text1?: string;
-  text2?: string;
-}
-
-export interface ImageFilterOptions {
-  image: string;
-  amount?: number;
-  factor?: number;
-}
-
-export interface BuilderOptions {
-  background?: string;
-  avatar?: string;
-  title?: string;
-  subtitle?: string;
-  text1?: string;
-  text2?: string;
-  textColor?: string;
-}
-
-type ApiResponse = Promise<ArrayBuffer>;
-
-/**
- * Utility for building query strings
- */
-function buildQuery(params: Record<string, unknown>): string {
-  return Object.entries(params)
-    .filter(([, v]) => v !== undefined && v !== null && v !== "")
-    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
-    .join("&");
-}
-
-/**
- * Internal fetch utility with error handling
- */
-async function fetchImage(
-  endpoint: string,
-  params: Record<string, unknown> = {},
-  baseUrl: string
-): ApiResponse {
-  const url = `${baseUrl}/${endpoint}${Object.keys(params).length ? "?" + buildQuery(params) : ""}`;
-  const res = await fetch(url);
-
-  const contentType = res.headers.get("content-type") ?? "";
-
-  if (res.ok && contentType.includes("image")) {
-    return res.arrayBuffer();
-  }
-
-  let errorBody: any;
-  try {
-    errorBody = await res.json();
-  } catch {
-    errorBody = { message: "Unknown error", status: res.status };
-  }
-
-  const err: ApiError = new Error(errorBody.message || `HTTP ${res.status}`);
-  err.status = errorBody.status ?? res.status;
-  throw err;
-}
-
-/**
- * Builder utility class for endpoints that require chained configuration.
- */
-class EndpointBuilder {
-  private payload: BuilderOptions = {};
-  private endpoint: string;
-  private baseUrl: string;
-
-  constructor(endpoint: string, baseUrl: string) {
-    this.endpoint = endpoint;
-    this.baseUrl = baseUrl;
-  }
-
-  setBackground(v: string) { this.payload.background = v; return this; }
-  setAvatar(v: string) { this.payload.avatar = v; return this; }
-  setTitle(v: string) { this.payload.title = v; return this; }
-  setSubtitle(v: string) { this.payload.subtitle = v; return this; }
-  setText1(v: string) { this.payload.text1 = v; return this; }
-  setText2(v: string) { this.payload.text2 = v; return this; }
-  setTextColor(v: string) { this.payload.textColor = v; return this; }
-
-  async build(): ApiResponse {
-    return fetchImage(this.endpoint, this.payload as Record<string, unknown>, this.baseUrl);
-  }
-}
-
-/**
- * Main API wrapper class
- */
 export class DubstepMadAPI {
   private readonly baseUrl: string;
 
