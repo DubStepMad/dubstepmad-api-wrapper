@@ -1,4 +1,4 @@
-# DubstepMad API Wrapper
+# DubStepMad API Wrapper
 
 [![npm version](https://img.shields.io/npm/v/@dubstepmad/dubstepmad-api-wrapper.svg?style=flat-square)](https://www.npmjs.com/package/@dubstepmad/dubstepmad-api-wrapper)
 [![build](https://img.shields.io/github/actions/workflow/status/dubstepmad/dubstepmad-api-wrapper/publish.yml?branch=main&style=flat-square)](https://github.com/dubstepmad/dubstepmad-api-wrapper/actions/workflows/publish.yml)
@@ -16,7 +16,7 @@ npm install @dubstepmad/dubstepmad-api-wrapper
 ## Examples
 
 ### Random memes command, no input example
-```bash
+```js
 const dubstepmad_api = require('dubstepmad-api-wrapper')
 const Discord = require('discord.js')
 
@@ -28,7 +28,7 @@ message.channel.send(embed)
 ```
 
 ### Lisa-Stage command, 1 text input example
-```bash
+```js
 const dubstepmad_api = require('dubstepmad-api-wrapper')
 const Discord = require('discord.js')
 
@@ -40,7 +40,7 @@ message.channel.send(attachment);
 ```
 
 ### Drake command, more than one text input example
-```bash
+```js
 const dubstepmad_api = require('dubstepmad-api-wrapper');
 
 let text1 = args.toString().split('/')[0].replace(/,/g,  '  ')
@@ -53,7 +53,7 @@ message.channel.send(attachment);
 ```
 
 ### Trash command, image input example
-```bash
+```js
 let Discord = require("discord.js");
 const dubstepmad_api = require('dubstepmad-api-wrapper')
 
@@ -67,19 +67,18 @@ message.channel.send(attachment);
 ```
 
 ### Balance card command, for more than 2 inputs example
-```bash
+```js
 let Discord = require("discord.js");
 const dubstepmad_api = require('dubstepmad-api-wrapper')
 
-let Image = await new dubstepmad_api.balancecard() //You first make the variable
-.setBackground(background) //then set all the arguments like so
-.setAvatar(avatar)
-.setTitle(title)
-.setText1(text1)
-.setText2(text2)
-.setTextColor(textcolor) //in hex
-.build() //and when your done, .build() it
-
+let Image = await new dubstepmad_api.balancecard()
+  .setBackground(background)
+  .setAvatar(avatar)
+  .setTitle(title)
+  .setText1(text1)
+  .setText2(text2)
+  .setTextColor(HEX_TEXT_COLOUR)
+  .build()
 
 let embed= new Discord.MessageEmbed()
   embed.setTitle(`Here is your balance ${message.author.username}!!`)
@@ -87,21 +86,36 @@ let embed= new Discord.MessageEmbed()
   embed.setImage('attachment://balance.png');
   embed.setColor(process.env.EMBEDCOLOR)
   embed.setFooter('Using Noodles API')
-message.channel.send(embed)
+  message.channel.send(embed)
 ```
 
 ### Welcome banner
-As for the welcome banner, it the same code as balance card, just remove text1 replace text2 with subtitle, aka setSubtitle, like so:
-```bash
+For the welcome banner, use the same code as the balance card example, but remove `.setText1()` and replace `.setText2()` with `.setSubtitle()`, as shown below:
+
+```js
 const dubstepmad_api = require('dubstepmad-api-wrapper')
 
 let Image = await new dubstepmad_api.welcomebanner()
-.setBackground(background)
-.setAvatar(avatar)
-.setTitle(username)
-.setSubtitle(subtitle)
-.setTextColor(textcolor) //in hex
-.build()
+  .setBackground(background)
+  .setAvatar(avatar)
+  .setTitle(username)
+  .setSubtitle(subtitle)
+  .setTextColor(HEX_TEXT_COLOUR)
+  .build()
 ```
 
-You can get a full list of the possible API endpoints [Here](https://api.dubstepmad.com/api/endpoints) 
+### Trading Card
+
+```js
+const dubstepmad_api = require('dubstepmad-api-wrapper')
+
+let Image = await new dubstepmad_api.welcomebanner()
+  .setBackground(background)
+  .setAvatar(avatar)
+  .setTitle(username)
+  .setSubtitle(subtitle)
+  .setTextColor(HEX_TEXT_COLOUR)
+  .build()
+```
+
+You can get a full list of the possible API endpoints [Here](https://api.dubstepmad.com/api/documentation) 

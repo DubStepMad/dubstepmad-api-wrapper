@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://registry.npmjs.org/
 
       - name: Install dependencies
@@ -32,8 +32,17 @@ jobs:
       - name: Sync package.json version with tag
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          echo "Publishing version $TAG_VERSION"
-          npm version $TAG_VERSION --no-git-tag-version
+          PKG_VERSION=$(node -p "require('./package.json').version")
+
+          echo "Tag version: $TAG_VERSION"
+          echo "Package.json version: $PKG_VERSION"
+
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "Updating package.json version..."
+            npm version $TAG_VERSION --no-git-tag-version
+          else
+            echo "package.json already at version $PKG_VERSION, skipping update."
+          fi
 
       - name: Debug ref
         run: echo "Github ref is $GITHUB_REF"
