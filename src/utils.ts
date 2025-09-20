@@ -1,5 +1,3 @@
-import fetch from "node-fetch";
-
 /**
  * Fetch an image from the DubstepMad API.
  * Automatically encodes query parameters correctly and avoids double-encoding.
@@ -8,7 +6,10 @@ export async function fetchImage(
   endpoint: string,
   params: Record<string, any> = {},
   baseUrl = "https://api.dubstepmad.com/api/v1/"
-): Promise<Buffer> {   // ✅ explicitly Buffer
+): Promise<Buffer> {
+  // ✅ Dynamic import of node-fetch for CJS & ESM compatibility
+  const fetchFn = (await import("node-fetch")).default;
+
   const query = Object.entries(params)
     .map(([key, value]) => {
       let v = value;
@@ -25,7 +26,7 @@ export async function fetchImage(
 
   const url = `${baseUrl}${endpoint}?${query}`;
 
-  const res = await fetch(url);
+  const res = await fetchFn(url);
 
   if (!res.ok) {
     let msg = res.statusText;
@@ -38,6 +39,5 @@ export async function fetchImage(
     throw new Error(`HTTP error! status: ${res.status} - ${msg}`);
   }
 
-  // ✅ Convert ArrayBuffer → Node Buffer
   return Buffer.from(await res.arrayBuffer());
 }

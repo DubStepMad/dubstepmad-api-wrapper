@@ -1,32 +1,25 @@
-import { describe, it, expect, beforeAll, afterAll, jest } from "@jest/globals";
+import { describe, it, expect, jest } from "@jest/globals";
 import { Buffer } from "buffer";
 
-// Mock the utils module for ESM
+// 1️⃣ Mock fetchImage module before importing API
 jest.unstable_mockModule("../src/utils.ts", () => ({
   fetchImage: jest.fn(async () => Buffer.from("fake image data")),
 }));
 
-// Now import the mocked modules dynamically
-const utils = await import("../src/utils.ts");
+// 2️⃣ Dynamically import the API wrapper after mocking
 const API = await import("../src/index.ts");
+const utils = await import("../src/utils.ts");
 const { EndpointBuilder } = await import("../src/builder.ts");
 
-// Helper type extraction
-type ApiFunctions = {
-  [K in keyof typeof API]: typeof API[K] extends (...args: any) => Promise<Buffer> ? typeof API[K] : never;
-};
+// 3️⃣ Helper types for cleaner iteration
+type ApiFunction = (...args: any[]) => Promise<Buffer>;
 
-type ApiFunctionKey = keyof ApiFunctions;
+// 4️⃣ Fake image response buffer
+const fakeBuffer = Buffer.from("fake image data");
 
-type BuilderFunctions = {
-  [K in keyof typeof API]: typeof API[K] extends () => EndpointBuilder ? typeof API[K] : never;
-};
-
-type BuilderFunctionKey = keyof BuilderFunctions;
-
-describe("DubstepMadAPI Functional Tests (ESM-safe & Mocked)", () => {
-  /* -------------------- Static API Function Tests -------------------- */
-  const apiTests: { fn: ApiFunctionKey; args: Parameters<ApiFunctions[ApiFunctionKey]> }[] = [
+describe("DubstepMadAPI Functional Tests (Mocked, ESM-safe)", () => {
+  /* -------------------- Meme Endpoints -------------------- */
+  const memeEndpoints: { fn: keyof typeof API; args: any[] }[] = [
     { fn: "lisastage", args: ["hello"] },
     { fn: "drake", args: ["top", "bottom"] },
     { fn: "worthless", args: ["test"] },
@@ -35,6 +28,18 @@ describe("DubstepMadAPI Functional Tests (ESM-safe & Mocked)", () => {
     { fn: "changemymind", args: ["change"] },
     { fn: "awkwardmonkey", args: ["monkey"] },
     { fn: "randommeme", args: [] },
+  ];
+
+  memeEndpoints.forEach(({ fn, args }) => {
+    it(`should fetch ${fn} meme`, async () => {
+      const result = await (API as any)[fn](...args);
+      expect(result).toBeInstanceOf(Buffer);
+      expect((utils.fetchImage as jest.Mock).mock.calls.length).toBeGreaterThan(0);
+    });
+  });
+
+  /* -------------------- Image Filters -------------------- */
+  const filterEndpoints: { fn: keyof typeof API; args: any[] }[] = [
     { fn: "blur", args: [{ image: "img.png", amount: 5 }] },
     { fn: "invert", args: ["img.png"] },
     { fn: "edges", args: ["img.png"] },
@@ -45,47 +50,29 @@ describe("DubstepMadAPI Functional Tests (ESM-safe & Mocked)", () => {
     { fn: "rip", args: ["img.png"] },
     { fn: "affectbaby", args: ["img.png"] },
     { fn: "trash", args: ["img.png"] },
-    { fn: "boostercard", args: ["img.png"] }
+    { fn: "boostercard", args: ["img.png"] },
   ];
 
-  apiTests.forEach(({ fn, args }) => {
-    it(`should fetch ${fn}`, async () => {
+  filterEndpoints.forEach(({ fn, args }) => {
+    it(`should fetch ${fn} filter`, async () => {
       const result = await (API as any)[fn](...args);
       expect(result).toBeInstanceOf(Buffer);
-      // Ensure our fetchImage mock was called
       expect((utils.fetchImage as jest.Mock).mock.calls.length).toBeGreaterThan(0);
     });
   });
 
-  /* -------------------- Dynamic Builder Tests -------------------- */
-  const builderKeys = Object.keys(API).filter(key => {
-    const fn = (API as any)[key];
-    if (typeof fn !== "function") return false;
-    try {
-      return fn() instanceof EndpointBuilder; // only builders
-    } catch {
-      return false;
-    }
-  }) as BuilderFunctionKey[];
+  /* -------------------- Builder Endpoints -------------------- */
+  const builderEndpoints: { fn: keyof typeof API; params: Record<string, any> }[] = [
+    { fn: "balancecard", params: { user: "123" } },
+    { fn: "welcomebanner", params: { background: "bg.png", avatar: "avatar.png", title: "Welcome!" } },
+  ];
 
-  builderKeys.forEach(fnName => {
-    it(`should build ${fnName} using EndpointBuilder`, async () => {
-      const builder = (API as any)[fnName]() as EndpointBuilder;
-
-      // Automatically detect all setter methods (methods starting with "set")
-      const setterKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(builder))
-        .filter(k => k.startsWith("set") && typeof (builder as any)[k] === "function");
-
-      setterKeys.forEach(k => {
-        try {
-          let exampleValue: any = "test"; // default string
-          if (k.toLowerCase().includes("amount") || k.toLowerCase().includes("factor")) exampleValue = 5;
-          (builder as any)[k](exampleValue);
-        } catch {
-          // ignore if setter fails
-        }
-      });
-
+  builderEndpoints.forEach(({ fn, params }) => {
+    it(`should build ${fn} using EndpointBuilder`, async () => {
+      const builder = (API as any)[fn]() as EndpointBuilder;
+      for (const [key, value] of Object.entries(params)) {
+        builder.setParam(key, value);
+      }
       const result = await builder.build();
       expect(result).toBeInstanceOf(Buffer);
       expect((utils.fetchImage as jest.Mock).mock.calls.length).toBeGreaterThan(0);

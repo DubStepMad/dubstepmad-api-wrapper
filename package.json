@@ -6,21 +6,18 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && tsup src/index.ts --format esm,cjs --dts",
     "dev": "npm run clean && tsup src/index.ts --format esm,cjs --dts --watch",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests"
   },
-  "keywords": [
-    "dubstepmad",
-    "api",
-    "wrapper",
-    "memes",
-    "discord"
-  ],
-  "author": "DubStepMad",
-  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "axios-mock-adapter": "^2.1.0",
