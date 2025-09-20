@@ -2,14 +2,11 @@
 module.exports = {
   preset: "ts-jest/presets/default-esm",
   testEnvironment: "node",
-  testRegex: "(/tests/.*|(\\.|/)(test|spec))\\.ts$", // <-- reliable for ESM + TS
+  testRegex: "(/tests/.*|(\\.|/)(test|spec))\\.ts$",
   transform: {
-    "^.+\\.ts$": ["ts-jest", {}], // modern way
+    "^.+\\.ts$": ["ts-jest", { useESM: true }]
   },
-  globals: {
-    "ts-jest": {
-      useESM: true
-    }
-  },
-  moduleFileExtensions: ["ts", "js", "json", "node"], // make sure TS files are recognized
+  moduleFileExtensions: ["ts", "js", "json", "node"],
+  extensionsToTreatAsEsm: [".ts"],
+  globals: {} // remove old ts-jest globals
 };

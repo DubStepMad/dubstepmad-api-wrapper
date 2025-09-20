@@ -6,9 +6,9 @@
  * clean design, strong typing, and maintainability.
  */
 
-import { MemeOptions, ImageFilterOptions, ApiResponse } from "./types.js";
-import { fetchImage } from "./utils.js";
-import { EndpointBuilder } from "./builder.js";
+import { fetchImage } from "./utils.ts";
+import { EndpointBuilder } from "./builder.ts";
+import { MemeOptions, ImageFilterOptions, ApiResponse } from "./types.ts";
 
 /* ----------------------- Meme Functions ----------------------- */
 export const lisastage = (text: string) => fetchImage("lisastage", { text });

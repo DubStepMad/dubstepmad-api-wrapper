@@ -1,4 +1,4 @@
-import { fetchImage } from "./utils.js";
+import { fetchImage } from "./utils.ts";
 
 type BuilderParams = Record<string, string | number | boolean>;
 
@@ -43,6 +43,7 @@ export class EndpointBuilder {
   }
 
   async build(): Promise<Buffer> {
-    return fetchImage(this.endpoint, this.params, this.baseUrl);
-  }
+    const arrayBuffer = await fetchImage(this.endpoint, this.params, this.baseUrl);
+  return Buffer.from(arrayBuffer); // convert ArrayBuffer → Buffer
+}
 }

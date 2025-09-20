@@ -31,4 +31,5 @@ export interface TradingCardOptions {
   cardType?: 'common' | 'uncommon' | 'rare' | 'ultra-rare';
 }
 
-export type ApiResponse = Promise<ArrayBuffer>;
+/** Generic API response type — now returning a Buffer */
+export type ApiResponse = Buffer;
