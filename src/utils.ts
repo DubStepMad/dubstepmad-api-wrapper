@@ -1,31 +1,43 @@
-import axios from "axios";
-import { ApiError } from "./errors";
+import fetch from "node-fetch";
 
-export function buildQuery(params: Record<string, unknown>): string {
-  return Object.entries(params)
-    .filter(([, v]) => v !== undefined && v !== null && v !== "")
-    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
-    .join("&");
-}
-
+/**
+ * Fetch an image from the DubstepMad API.
+ * Automatically encodes query parameters correctly and avoids double-encoding.
+ */
 export async function fetchImage(
   endpoint: string,
-  params: Record<string, unknown> = {},
-  baseUrl: string
-): Promise<ArrayBuffer> {
-  const url = `${baseUrl}/${endpoint}${Object.keys(params).length ? "?" + buildQuery(params) : ""}`;
-  try {
-    const res = await axios.get(url, { responseType: "arraybuffer" });
-    const contentType = res.headers["content-type"] ?? "";
-    if (contentType.includes("image")) {
-      return res.data;
+  params: Record<string, any> = {},
+  baseUrl = "https://api.dubstepmad.com/api/v1/"
+): Promise<Buffer> {   // ✅ explicitly Buffer
+  const query = Object.entries(params)
+    .map(([key, value]) => {
+      let v = value;
+      if (typeof v === "string") {
+        try {
+          v = decodeURIComponent(v);
+        } catch {
+          // ignore if not encoded
+        }
+      }
+      return `${key}=${encodeURIComponent(v)}`;
+    })
+    .join("&");
+
+  const url = `${baseUrl}${endpoint}?${query}`;
+
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    let msg = res.statusText;
+    try {
+      const data = await res.json();
+      msg = data.message || msg;
+    } catch {
+      // ignore, not JSON
     }
-    throw new ApiError("Unexpected content type", res.status);
-  } catch (err: any) {
-    if (err.response) {
-      const { status, data } = err.response;
-      throw new ApiError(data?.message || `HTTP ${status}`, status);
-    }
-    throw new ApiError(err.message);
+    throw new Error(`HTTP error! status: ${res.status} - ${msg}`);
   }
+
+  // ✅ Convert ArrayBuffer → Node Buffer
+  return Buffer.from(await res.arrayBuffer());
 }

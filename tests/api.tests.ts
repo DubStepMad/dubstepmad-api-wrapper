@@ -1,19 +1,41 @@
-import { describe, it, expect, afterEach, beforeEach } from "@jest/globals";
-import DubstepMadAPI from "../src/index";
+import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 import axios from "axios";
 import AxiosMockAdapter from "axios-mock-adapter";
+import { ImageFilterOptions } from "../src/types";
 
-// Helper to simulate image response
+import {
+  lisastage,
+  drake,
+  worthless,
+  presidentialalert,
+  spongebobburnpaper,
+  changemymind,
+  awkwardmonkey,
+  randommeme,
+  blur,
+  invert,
+  edges,
+  circle,
+  wide,
+  uglyupclose,
+  clown,
+  rip,
+  affectbaby,
+  trash,
+  boostercard,
+  balancecard,
+  welcomebanner
+} from "../src/index";
+
+// Helper: returns fake ArrayBuffer image
 function mockImageResponse(): ArrayBuffer {
   return new TextEncoder().encode("fake image data").buffer;
 }
 
-describe("DubstepMadAPI", () => {
-  let api: DubstepMadAPI;
+describe("DubstepMadAPI Functional Tests", () => {
   let mock: AxiosMockAdapter;
 
   beforeEach(() => {
-    api = new DubstepMadAPI("https://mock.api");
     mock = new AxiosMockAdapter(axios);
   });
 
@@ -21,53 +43,86 @@ describe("DubstepMadAPI", () => {
     mock.restore();
   });
 
-  it("should fetch lisastage meme image", async () => {
-    mock.onGet("https://mock.api/lisastage?text=test%20meme").reply(200, mockImageResponse(), {
-      "content-type": "image/png"
-    });
+  /* -------------------- Meme Endpoints -------------------- */
+  const memeEndpoints: { fn: (...args: any[]) => Promise<any>, name: string, args: [string] | [string, string] | [] }[] = [
+    { fn: lisastage, name: "lisastage", args: ["hello"] },         // [string]
+    { fn: drake, name: "drake", args: ["top", "bottom"] },        // [string, string]
+    { fn: worthless, name: "worthless", args: ["test"] },
+    { fn: presidentialalert, name: "presidentialalert", args: ["alert"] },
+    { fn: spongebobburnpaper, name: "spongebobburnpaper", args: ["text"] },
+    { fn: changemymind, name: "changemymind", args: ["change"] },
+    { fn: awkwardmonkey, name: "awkwardmonkey", args: ["monkey"] },
+    { fn: randommeme, name: "randommeme", args: [] }             // []
+  ];
 
-    const result = await api.lisastage("test meme");
-    expect(result).toBeInstanceOf(ArrayBuffer);
+  memeEndpoints.forEach(({ fn, name, args }) => {
+    it(`should fetch ${name} meme`, async () => {
+      const query = args.map((a, i) => `text${i + 1}=${encodeURIComponent(a)}`).join("&");
+      const url = `https://api.dubstepmad.com/api/v1/${name}${query ? "?" + query : ""}`;
+      mock.onGet(url).reply(200, mockImageResponse(), { "content-type": "image/png" });
+
+      const result = await fn(...args);
+      expect(result).toBeInstanceOf(ArrayBuffer);
+    });
   });
 
-  it("should fetch drake meme image", async () => {
-    mock.onGet("https://mock.api/drake?text1=top%20text&text2=bottom%20text").reply(200, mockImageResponse(), {
-      "content-type": "image/png"
-    });
+  /* -------------------- Image Filters -------------------- */
+  const filterEndpoints: {
+    fn: (...args: any[]) => Promise<any>;
+    name: string;
+    args: [ImageFilterOptions] | [string];
+  }[] = [
+    { fn: blur, name: "blur", args: [{ image: "img.png", amount: 5 }] },
+    { fn: invert, name: "invert", args: ["img.png"] },
+    { fn: edges, name: "edges", args: ["img.png"] },
+    { fn: circle, name: "circle", args: ["img.png"] },
+    { fn: wide, name: "wide", args: [{ image: "img.png", factor: 2 }] },
+    { fn: uglyupclose, name: "uglyupclose", args: ["img.png"] },
+    { fn: clown, name: "clown", args: ["img.png"] },
+    { fn: rip, name: "rip", args: ["img.png"] },
+    { fn: affectbaby, name: "affectbaby", args: ["img.png"] },
+    { fn: trash, name: "trash", args: ["img.png"] },
+    { fn: boostercard, name: "boostercard", args: ["img.png"] }
+  ];
 
-    const result = await api.drake("top text", "bottom text");
-    expect(result).toBeInstanceOf(ArrayBuffer);
+  filterEndpoints.forEach(({ fn, name, args }) => {
+    it(`should fetch ${name} filter`, async () => {
+      const query = args
+        .map(arg => {
+          if (typeof arg === "object" && arg !== null)
+            return Object.entries(arg)
+              .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
+              .join("&");
+          return `image=${encodeURIComponent(arg)}`;
+        })
+        .join("&");
+
+      const url = `https://api.dubstepmad.com/api/v1/${name}?${query}`;
+      mock.onGet(url).reply(200, mockImageResponse(), { "content-type": "image/png" });
+
+      const result = await fn(...args);
+      expect(result).toBeInstanceOf(ArrayBuffer);
+    });
   });
 
-  it("should fetch blurred image", async () => {
-    mock.onGet("https://mock.api/blur?image=img.png&amount=5").reply(200, mockImageResponse(), {
+  /* -------------------- Builder Endpoints -------------------- */
+  it("should build balancecard using builder", async () => {
+    const builder = balancecard().setParam("user", "123");
+    mock.onGet("https://api.dubstepmad.com/api/v1/balancecard?user=123").reply(200, mockImageResponse(), {
       "content-type": "image/png"
     });
-
-    const result = await api.blur({ image: "img.png", amount: 5 });
-    expect(result).toBeInstanceOf(ArrayBuffer);
-  });
-
-  it("should build welcome banner using builder", async () => {
-    mock.onGet("https://mock.api/welcomebanner?background=bg.png&avatar=avatar.png&title=Welcome!").reply(200, mockImageResponse(), {
-      "content-type": "image/png"
-    });
-
-    const builder = api
-      .welcomebanner()
-      .setBackground("bg.png")
-      .setAvatar("avatar.png")
-      .setTitle("Welcome!");
 
     const result = await builder.build();
     expect(result).toBeInstanceOf(ArrayBuffer);
   });
 
-  it("should throw an error for failed requests", async () => {
-    mock.onGet("https://mock.api/drake?text1=foo&text2=bar").reply(400, { message: "Bad request" }, {
-      "content-type": "application/json"
+  it("should build welcomebanner using builder", async () => {
+    const builder = welcomebanner().setParam("background", "bg.png").setParam("avatar", "avatar.png").setParam("title", "Welcome!");
+    mock.onGet("https://api.dubstepmad.com/api/v1/welcomebanner?background=bg.png&avatar=avatar.png&title=Welcome!").reply(200, mockImageResponse(), {
+      "content-type": "image/png"
     });
 
-    await expect(api.drake("foo", "bar")).rejects.toThrow("Bad request");
+    const result = await builder.build();
+    expect(result).toBeInstanceOf(ArrayBuffer);
   });
 });

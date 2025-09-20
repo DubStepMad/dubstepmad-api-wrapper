@@ -1,7 +1,9 @@
 "use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -15,29 +17,149 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
-  default: () => DubstepMadAPI
+  affectbaby: () => affectbaby,
+  awkwardmonkey: () => awkwardmonkey,
+  balancecard: () => balancecard,
+  blur: () => blur,
+  boostercard: () => boostercard,
+  changemymind: () => changemymind,
+  circle: () => circle,
+  clown: () => clown,
+  drake: () => drake,
+  edges: () => edges,
+  invert: () => invert,
+  lisastage: () => lisastage,
+  presidentialalert: () => presidentialalert,
+  randommeme: () => randommeme,
+  rip: () => rip,
+  spongebobburnpaper: () => spongebobburnpaper,
+  trash: () => trash,
+  uglyupclose: () => uglyupclose,
+  welcomebanner: () => welcomebanner,
+  wide: () => wide,
+  worthless: () => worthless
 });
 module.exports = __toCommonJS(index_exports);
-var DubstepMadAPI = class {
-  constructor(baseUrl = "https://dubstepmad.com/api") {
+
+// src/utils.ts
+var import_node_fetch = __toESM(require("node-fetch"), 1);
+async function fetchImage(endpoint, params = {}, baseUrl = "https://api.dubstepmad.com/api/v1/") {
+  const query = Object.entries(params).map(([key, value]) => {
+    let v = value;
+    if (typeof v === "string") {
+      try {
+        v = decodeURIComponent(v);
+      } catch {
+      }
+    }
+    return `${key}=${encodeURIComponent(v)}`;
+  }).join("&");
+  const url = `${baseUrl}${endpoint}?${query}`;
+  const res = await (0, import_node_fetch.default)(url);
+  if (!res.ok) {
+    let msg = res.statusText;
+    try {
+      const data = await res.json();
+      msg = data.message || msg;
+    } catch {
+    }
+    throw new Error(`HTTP error! status: ${res.status} - ${msg}`);
+  }
+  return Buffer.from(await res.arrayBuffer());
+}
+
+// src/builder.ts
+var EndpointBuilder = class {
+  constructor(endpoint, baseUrl = "https://api.dubstepmad.com/api/v1/") {
+    this.params = {};
+    this.endpoint = endpoint;
     this.baseUrl = baseUrl;
   }
-  async get(endpoint) {
-    const res = await fetch(`${this.baseUrl}/${endpoint}`);
-    if (!res.ok) {
-      throw new Error(`API error: ${res.status} - ${res.statusText}`);
-    }
-    return res.json();
+  setBackground(url) {
+    this.params.background = url;
+    return this;
   }
-  async getTracks() {
-    return this.get("tracks");
+  setAvatar(url) {
+    this.params.avatar = url;
+    return this;
   }
-  async getDjs() {
-    return this.get("djs");
+  setTitle(title) {
+    this.params.title = title;
+    return this;
+  }
+  setSubtitle(subtitle) {
+    this.params.subtitle = subtitle;
+    return this;
+  }
+  setTextColor(color) {
+    this.params.textColor = color;
+    return this;
+  }
+  setParam(key, value) {
+    this.params[key] = value;
+    return this;
+  }
+  async build() {
+    return fetchImage(this.endpoint, this.params, this.baseUrl);
   }
 };
+
+// src/index.ts
+var lisastage = (text) => fetchImage("lisastage", { text });
+var drake = (text1, text2) => fetchImage("drake", { text1, text2 });
+var worthless = (text) => fetchImage("worthless", { text });
+var presidentialalert = (text) => fetchImage("presidentialalert", { text });
+var spongebobburnpaper = (text) => fetchImage("spongebobburnpaper", { text });
+var changemymind = (text) => fetchImage("changemymind", { text });
+var awkwardmonkey = (text) => fetchImage("awkwardmonkey", { text });
+var randommeme = () => fetchImage("randommeme");
+var blur = ({ image, amount }) => fetchImage("blur", { image, amount });
+var invert = (image) => fetchImage("invert", { image });
+var edges = (image) => fetchImage("edges", { image });
+var circle = (image) => fetchImage("circle", { image });
+var wide = ({ image, factor }) => fetchImage("wide", { image, factor });
+var uglyupclose = (image) => fetchImage("uglyupclose", { image });
+var clown = (image) => fetchImage("clown", { image });
+var rip = (image) => fetchImage("rip", { image });
+var affectbaby = (image) => fetchImage("affectbaby", { image });
+var trash = (image) => fetchImage("trash", { image });
+var boostercard = (image) => fetchImage("boostercard", { image });
+var balancecard = () => new EndpointBuilder("balancecard");
+var welcomebanner = () => new EndpointBuilder("welcomebanner");
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  affectbaby,
+  awkwardmonkey,
+  balancecard,
+  blur,
+  boostercard,
+  changemymind,
+  circle,
+  clown,
+  drake,
+  edges,
+  invert,
+  lisastage,
+  presidentialalert,
+  randommeme,
+  rip,
+  spongebobburnpaper,
+  trash,
+  uglyupclose,
+  welcomebanner,
+  wide,
+  worthless
+});

@@ -2,13 +2,14 @@
   "name": "@dubstepmad/dubstepmad-api-wrapper",
   "version": "1.2.2",
   "description": "TypeScript wrapper for the DubstepMad API",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsup src/index.ts --format esm,cjs --dts",
+    "dev": "npm run clean && tsup src/index.ts --format esm,cjs --dts --watch",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests"
   },
   "keywords": [
@@ -25,10 +26,13 @@
     "axios-mock-adapter": "^2.1.0",
     "cross-env": "^10.0.0",
     "jest": "^30.0.5",
+    "rimraf": "^6.0.1",
     "ts-jest": "^29.4.1",
-    "tsup": "^8.5.0"
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2"
   },
   "dependencies": {
-    "axios": "^1.11.0"
+    "axios": "^1.11.0",
+    "node-fetch": "^3.3.2"
   }
 }

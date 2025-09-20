@@ -1,111 +1,38 @@
 /**
  * DubstepMad API Wrapper
- * 
+ *
  * A TypeScript-first wrapper around the DubstepMad API,
- * inspired by the FrenchNoodles wrapper, with a focus on 
+ * inspired by the FrenchNoodles wrapper, with a focus on
  * clean design, strong typing, and maintainability.
  */
 
-import { MemeOptions, ImageFilterOptions, ApiResponse } from "./types";
-import { fetchImage } from "./utils";
-import { EndpointBuilder } from "./builder";
+import { MemeOptions, ImageFilterOptions, ApiResponse } from "./types.js";
+import { fetchImage } from "./utils.js";
+import { EndpointBuilder } from "./builder.js";
 
-export class DubstepMadAPI {
-  private readonly baseUrl: string;
+/* ----------------------- Meme Functions ----------------------- */
+export const lisastage = (text: string) => fetchImage("lisastage", { text });
+export const drake = (text1: string, text2: string) => fetchImage("drake", { text1, text2 });
+export const worthless = (text: string) => fetchImage("worthless", { text });
+export const presidentialalert = (text: string) => fetchImage("presidentialalert", { text });
+export const spongebobburnpaper = (text: string) => fetchImage("spongebobburnpaper", { text });
+export const changemymind = (text: string) => fetchImage("changemymind", { text });
+export const awkwardmonkey = (text: string) => fetchImage("awkwardmonkey", { text });
+export const randommeme = () => fetchImage("randommeme");
 
-  constructor(baseUrl: string = "https://dubstepmad.com/api/endpoints") {
-    this.baseUrl = baseUrl;
-  }
+/* --------------------- Image Filters --------------------- */
+export const blur = ({ image, amount }: ImageFilterOptions) => fetchImage("blur", { image, amount });
+export const invert = (image: string) => fetchImage("invert", { image });
+export const edges = (image: string) => fetchImage("edges", { image });
+export const circle = (image: string) => fetchImage("circle", { image });
+export const wide = ({ image, factor }: ImageFilterOptions) => fetchImage("wide", { image, factor });
+export const uglyupclose = (image: string) => fetchImage("uglyupclose", { image });
+export const clown = (image: string) => fetchImage("clown", { image });
+export const rip = (image: string) => fetchImage("rip", { image });
+export const affectbaby = (image: string) => fetchImage("affectbaby", { image });
+export const trash = (image: string) => fetchImage("trash", { image });
+export const boostercard = (image: string) => fetchImage("boostercard", { image });
 
-  /* ----------------------- Meme Endpoints ----------------------- */
-
-  lisastage(text: string): ApiResponse {
-    return fetchImage("lisastage", { text }, this.baseUrl);
-  }
-
-  drake(text1: string, text2: string): ApiResponse {
-    return fetchImage("drake", { text1, text2 }, this.baseUrl);
-  }
-
-  worthless(text: string): ApiResponse {
-    return fetchImage("worthless", { text }, this.baseUrl);
-  }
-
-  presidentialalert(text: string): ApiResponse {
-    return fetchImage("presidentialalert", { text }, this.baseUrl);
-  }
-
-  spongebobburnpaper(text: string): ApiResponse {
-    return fetchImage("spongebobburnpaper", { text }, this.baseUrl);
-  }
-
-  changemymind(text: string): ApiResponse {
-    return fetchImage("changemymind", { text }, this.baseUrl);
-  }
-
-  awkwardmonkey(text: string): ApiResponse {
-    return fetchImage("awkwardmonkey", { text }, this.baseUrl);
-  }
-
-  randommeme(): ApiResponse {
-    return fetchImage("randommeme", {}, this.baseUrl);
-  }
-
-  /* --------------------- Image Filters --------------------- */
-
-  blur({ image, amount }: ImageFilterOptions): ApiResponse {
-    return fetchImage("blur", { image, amount }, this.baseUrl);
-  }
-
-  invert(image: string): ApiResponse {
-    return fetchImage("invert", { image }, this.baseUrl);
-  }
-
-  edges(image: string): ApiResponse {
-    return fetchImage("edges", { image }, this.baseUrl);
-  }
-
-  circle(image: string): ApiResponse {
-    return fetchImage("circle", { image }, this.baseUrl);
-  }
-
-  wide({ image, factor }: ImageFilterOptions): ApiResponse {
-    return fetchImage("wide", { image, factor }, this.baseUrl);
-  }
-
-  uglyupclose(image: string): ApiResponse {
-    return fetchImage("uglyupclose", { image }, this.baseUrl);
-  }
-
-  clown(image: string): ApiResponse {
-    return fetchImage("clown", { image }, this.baseUrl);
-  }
-
-  rip(image: string): ApiResponse {
-    return fetchImage("rip", { image }, this.baseUrl);
-  }
-
-  affectbaby(image: string): ApiResponse {
-    return fetchImage("affectbaby", { image }, this.baseUrl);
-  }
-
-  trash(image: string): ApiResponse {
-    return fetchImage("trash", { image }, this.baseUrl);
-  }
-
-  boostercard(image: string): ApiResponse {
-    return fetchImage("boostercard", { image }, this.baseUrl);
-  }
-
-  /* --------------------- Builder Endpoints --------------------- */
-
-  balancecard(): EndpointBuilder {
-    return new EndpointBuilder("balancecard", this.baseUrl);
-  }
-
-  welcomebanner(): EndpointBuilder {
-    return new EndpointBuilder("welcomebanner", this.baseUrl);
-  }
-}
-
-export default DubstepMadAPI;
+/* --------------------- Builder Functions --------------------- */
+export const balancecard = () => new EndpointBuilder("balancecard");
+export const welcomebanner = () => new EndpointBuilder("welcomebanner");
